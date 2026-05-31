@@ -1,0 +1,19 @@
+{
+    "files.associations": {
+        "stm32f4xx_hal.h": "c",
+        "stm32f4xx_hal_def.h": "c",
+        "stm32f4xx_hal_conf.h": "c",
+        "stm32f446xx.h": "c",
+        "main.h": "c",
+        "if_lcd.h": "c",
+        "examples.h": "c"
+    },
+    "cSpell.words": [
+        "CGRAM",
+        "DDRAM",
+        "hdac",
+        "htim",
+        "huart"
+    ],
+    "git.ignoreLimitWarning": true
+}
