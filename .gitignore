@@ -6,5 +6,6 @@
 # ===== examples =====
 # draw.io temporary files
 *.drawio.dtmp
+*.drawio.bkp
 
 # STM32依存ファイルは別管理
