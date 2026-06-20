@@ -4,4 +4,7 @@
 
 
 # ===== examples =====
+# draw.io temporary files
+*.drawio.dtmp
+
 # STM32依存ファイルは別管理
