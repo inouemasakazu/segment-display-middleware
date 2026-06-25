@@ -33,7 +33,7 @@
 		<link>
 			<name>src</name>
 			<type>2</type>
-			<location>D:/workspace/STM32/f446re/project/segment_led/src</location>
+			<location>D:/workspace/repo/segment-middleware/src</location>
 		</link>
 	</linkedResources>
 </projectDescription>
