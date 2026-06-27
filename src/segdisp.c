@@ -10,7 +10,7 @@
 /****************************************************************************************************
  * Private include
  ****************************************************************************************************/
-#include "../inc/segdisp.h"
+#include "segdisp_7seg.h"
 
 #include <string.h>
 #include <stdbool.h>
@@ -70,6 +70,19 @@ int segdisp_init(segdisp_t *segdisp, uint8_t segment, uint8_t digit)
         segdisp_set_control(segdisp, SEGDISP_CONTROL_STATIC);
 
         segdisp->len = digit;
+
+        /* セグメント数に応じた設定 */
+        switch (segment)
+        {
+        case 7:
+            /* 7セグ用の初期化 */
+            segdisp_7seg_init(segdisp);
+            break;
+
+        default:
+            /* DO NOTHING */
+            break;
+        }
     }
 
     return success;
