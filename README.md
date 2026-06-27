@@ -51,6 +51,8 @@ segment-display-middleware/
   ├── inc/
   |     └── segdisp.h
   ├── src/
+  |     ├── segdisp_7seg.c
+  |     ├── segdisp_7seg.h
   |     └── segdisp.c
   └── RAEDME.md
 ```
@@ -71,20 +73,22 @@ mcu
 
 
 ## 使用例
-1桁の7セグメントディスプレイを制御するサンプルコードを以下に記載する。  
+1桁の典型的な7セグメントディスプレイを制御するサンプルコードを以下に記載します。  
 
 ```c
 static segdisp_t segment;
 
+/***
+ * @brief 7セグ初期化・描画開始
+ */
 void sample(void)
 {
     /* セグメントLED初期化 */
     segdisp_init(&segment, 1);              /* 1桁のLEDを使用 */
     segdisp_set_static_control(&segment);   /* スタティック制御 */
 
-    /* 描画コールバックとエンコードコールバックの設定 */
+    /* 描画CBの設定 */
     segdisp_set_draw_cb(&segment, draw_cb);
-    segdispset_encode_cb(&segment, encode_cb);
 
     /* 7セグメントディスプレイに"0."を表示する */
     segdisp_set_text(&segment, "0.");
@@ -96,68 +100,11 @@ void sample(void)
 }
 
 /***
- * @brief 描画コールバック
+ * @brief 描画CB
  */
 static void draw_cb(const uint32_t *data, uint8_t len, uint8_t pos)
 {
     uint8_t byte = (uint8_t)*data;
     /* HWの仕様に合わせてユーザーが定義する。 */
-}
-
-/***
- * @brief エンコードコールバック
- * @details 7セグメントLEDの表示部(点灯部)に合わせて、
- *          textデータから任意のbitパターンにエンコードを行う。
- *
- *          実装例ではtextから、数字・小数点(ドット)に対応したbitパターンにエンコードしている。
- */
-static uint8_t encode_cb(const uint8_t *c, uint32_t *pattern)
-{
-    /* 7segment led用bitパターン */
-    uint32_t num_bit[] = {
-        0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F
-    };
-
-    uint8_t length = 0;
-
-    for (size_t i = 0; i < SEG_DIGIT_LENGTH; i++)
-    {
-        if (c[i] == '\0')
-        {
-            /* 文字列終端 */
-            break;
-        }
-        else
-        {
-            /* パターン変換 */
-            if (('0' <= c[i]) && (c[i] <= '9'))
-            {
-                /* 数字はbitパターンに変換して格納 */
-                pattern[length] = num_bit[(c[i] - '0')];
-                length++;
-            }
-            else if (c[i] == '.')
-            {
-                /* 小数点はbitパターンの8bit目を点灯 */
-                if (length == 0)
-                {
-                    pattern[length] |= 0x80;
-                    length++;
-                }
-                else
-                {
-                    pattern[(length - 1)] |= 0x80;
-                }
-            }
-            else
-            {
-                /* 数字じゃない場合は例外扱い */
-                pattern[length] = 0x00;
-                length++;
-            }
-        }
-    }
-
-    return length;
 }
 ```
