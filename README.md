@@ -1,4 +1,4 @@
-# セグメントLED制御用ミドルウェア
+# segment-display-middleware
 
 ## 目次
 1. [概要](#概要)
@@ -9,8 +9,9 @@
 
 
 ## 概要
-セグメントLED制御用ミドルウェアモジュールについて説明する。  
-本モジュールは、数字情報等の表示に特化したセグメントLEDの制御用ソフトウェアとして定義する。  
+「segment-display-middleware」では数字情報等の表示に特化した、
+セグメントLEDを制御するためのミドルウェアモジュールを提供します。  
+
 
 ### 目的
 セグメントLEDがもつ機能を抽象化し、ユーザーアプリケーションがマイコン・HW環境に依存しないソフトウェアモジュールの提供を目的とする。  
@@ -32,7 +33,7 @@
 ## ディレクトリ構成
 本モジュールのディレクトリ構成を以下に示す。
 ```text
-segment-middleware/
+segment-display-middleware/
   ├── example/
   |     ├── demo_segment_led/
   |     |    ├── Core/
@@ -48,9 +49,9 @@ segment-middleware/
   |     ├── docs/
   |     └── RAEDME.md
   ├── inc/
-  |     └── segment.h
+  |     └── segdisp.h
   ├── src/
-  |     └── segment.c
+  |     └── segdisp.c
   └── RAEDME.md
 ```
 
@@ -61,7 +62,7 @@ segment-middleware/
 ```text
 APP
  ↑
-segment middleware
+segment-display-middleware
  ↑
 HW driver
  ↑
@@ -69,69 +70,29 @@ mcu
 ```
 
 
-## API
-公開API一覧を表に記載する。 
-
-| API | 説明 | 備考 |
-|:--|---|:-:|
-| seg_init() | 初期化 | - |
-| seg_set_draw_cb() | 描画コールバック設定 | (Note1) |
-| seg_set_encode_cb() | エンコードコールバック設定 | (Note2) |
-| seg_set_static_control() | スタティック制御設定 | - |
-| seg_set_dynamic_control() | ダイナミック制御設定 | - |
-| seg_update() | 状態・周期更新 | (Note3) |
-| seg_set_text() | 表示データ設定(text) | - |
-| seg_set_pattern() | 表示データ設定(bitパターン) | - |
-| seg_hidden_on() | 非表示ON | - |
-| seg_hidden_off() | 非表示OFF | - |
-| seg_blink_on() | 点滅ON | (Note3) |
-| seg_blink_off() | 点滅OFF | - |
-| seg_set_scan_cycle() | 描画更新周期設定(ダイナミック制御用) | - |
-
-* Note  
-1. 本コールバックの登録がされていない場合は、セグメントLEDの表示・更新がされない。  
-表示制御を行うHWドライバーの登録を行うこと。
-2. 表示データ設定(text)を使用する場合、本コールバックの登録が必要となる。  
-textに応じたbitパターンをユーザーが生成する。
-3. 本モジュールは内部で周期管理を行っている。  
-seg_updateの引数「period」に任意の値を指定することで周期の更新が可能。  
-periodには前回呼び出しからの経過時間(ms)を指定し、経過時間は1ms以上を推奨する。  
-
-
 ## 使用例
-4桁のセグメントLEDをダイナミック制御で動作させる実装例を以下に示す。  
-また、「example」配下にサンプルコード・動作例を格納する  
-
+1桁の7セグメントディスプレイを制御するサンプルコードを以下に記載する。  
 
 ```c
-static seg_ctx_t segment;
+static segdisp_t segment;
 
-void display_init(void)
+void sample(void)
 {
     /* セグメントLED初期化 */
-    seg_init(&segment, 4);                  /* 4桁のLEDを使用 */
-    seg_set_dynamic_control(&segment);      /* ダイナミック制御 */
+    segdisp_init(&segment, 1);              /* 1桁のLEDを使用 */
+    segdisp_set_static_control(&segment);   /* スタティック制御 */
 
     /* 描画コールバックとエンコードコールバックの設定 */
-    seg_set_draw_cb(&segment, draw_cb);
-    seg_set_encode_cb(&segment, encode_cb);
+    segdisp_set_draw_cb(&segment, draw_cb);
+    segdispset_encode_cb(&segment, encode_cb);
 
-    /* LEDに"2026"と表示 */
-    seg_set_text(&segment, "2026");
+    /* 7セグメントディスプレイに"0."を表示する */
+    segdisp_set_text(&segment, "0.");
 
-    /* 点滅ON */
-    seg_blink_on(&segment, 0, 500);         /* blink 500ms cycle */
-}
-
-/***
- * @brief 表示更新割り込み
- * @details タイマ割り込みなどで呼び出す。
- *          表示更新周期は1msを推奨。
- */
-void display_interrupt(void)
-{
     /* 表示更新 */
-    seg_update(&segment, 1);    /* 1ms period inc */
+    segdisp_update(&segment, 1);    /* 1ms period inc */
+
+    while(1);
 }
 
 /***
