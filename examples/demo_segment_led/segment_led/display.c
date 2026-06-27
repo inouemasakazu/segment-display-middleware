@@ -59,8 +59,8 @@ static void digit_position_control(uint8_t position);
 void display_init(void)
 {
     /* セグメントLED制御データ初期化 */
-    segdisp_init(&segment, 4);
-    segdisp_set_dynamic_control(&segment);      /* ダイナミック制御 */
+    segdisp_init(&segment, 7, 4);
+    segdisp_set_control(&segment, SEGDISP_CONTROL_DYNAMIC);      /* ダイナミック制御 */
 
     /* 描画コールバックとエンコードコールバックの設定 */
     segdisp_set_draw_cb(&segment, draw_cb);
