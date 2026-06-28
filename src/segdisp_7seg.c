@@ -11,7 +11,6 @@
  * Private include
  ****************************************************************************************************/
 #include "segdisp_7seg.h"
-#include "../inc/segdisp.h"
 
 #include <string.h>
 #include <stdbool.h>
